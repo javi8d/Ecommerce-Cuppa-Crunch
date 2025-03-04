@@ -5,13 +5,16 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const onSubmitHandler = async (event) => { 
-    event.preventDefault();
+    event.preventDefault()
     try{
       const response = await axios.post("http://localhost:5000/login", {email, password})
       if(response.data.success){
         console.log("Logged in succesfully!")
         localStorage.setItem("token", response.data.token)
+        localStorage.setItem("id", response.data.id)
+        setSuccessMessage(response.data.message || "Logged in successfully!")
       } else{
         setErrorMessage(response.data.message || "Invalid credentials")
       }
@@ -67,7 +70,7 @@ const Login = () => {
         />
       </div>
       
-
+      <a className="text-blue-500 underline" href="/signup">Sign Up</a>
       {/* Submit Button */}
       <button
         type="submit"
@@ -76,7 +79,8 @@ const Login = () => {
       >
         Log In
       </button>
-      {errorMessage && <p>{errorMessage}</p>}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
     </form>
   );
 };

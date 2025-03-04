@@ -12,7 +12,7 @@ const ShopContextProvider = (props) => {
     const[cartItems,setCartItems] = useState({})
     const [products, setProducts] = useState([]);
     const navigate = useNavigate()
-
+    
     useEffect(() => {
         const fetchProducts = async () => {
           try {
@@ -54,7 +54,7 @@ const ShopContextProvider = (props) => {
     const getCartAmount = () => {
         let totalAmount = 0;
         for (const itemId in cartItems) {
-          const product = products.find((product) => Number(product.id) === Number(itemId));
+          const product = products.find((product) => String(product._id) === String(itemId));
           if (product) {
             const quantity = cartItems[itemId];
             if (quantity > 0) {

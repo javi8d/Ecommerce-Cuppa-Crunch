@@ -6,6 +6,7 @@ const ProductModel = require('./modules/products')
 const UserModel = require('./modules/users')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const OrdersModel = require('./modules/orders')
 
 // Initialize dotenv to access environment variables
 dotenv.config();
@@ -70,13 +71,53 @@ mongoose.connect(process.env.MONGO_URI)
         return res.status(400).json({ message: "Invalid credentials" });
       }  
       const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '4h' });
-      res.json({ success: true, message: "Logged in successfully!", token });
-  
+      const id = user._id
+      res.json({ success: true, message: "Logged in successfully!", token, id});
     } catch (err) {
       res.status(500).json({ message: "Server error" });
     }
   });
+  app.post('/orders', async (req, res) => {
+    const { userId, products, totalAmount, status, fname, lname, email, address, city, state, zipcode, phone, method } = req.body;
   
+    try {
+      const order = new OrdersModel({
+        userId,         // Store the userId who placed the order
+        products,       // Store the product IDs in the order
+        totalAmount,    // Store the total amount of the order
+        status,         // Store the order status (e.g., 'pending', 'completed')
+        fname,
+        lname,
+        email,
+        address,
+        city,
+        state,
+        zipcode,
+        phone,
+        method
+      });
+  
+      await order.save();
+
+      res.status(201).json(order);
+    } catch (err) {
+      console.error('Error saving order:', err);
+      res.status(500).json({ message: 'Failed to create order' });
+    }
+  });
+  app.get("/orders/:userId", async(req, res) => {
+    const {userId} = req.params;
+    try{
+      const orders = await OrdersModel.find({userId});
+      if(!orders.length){
+        return res.status(404).json({message: "No orders found for this user"})
+      }
+      res.json(orders)
+    }catch(err){
+      console.error("Error fetching orders: ", err);
+      res.status(500).json({message: "Failed fetching orders"})
+    }
+  })
   
 
 const port = process.env.PORT || 5000;

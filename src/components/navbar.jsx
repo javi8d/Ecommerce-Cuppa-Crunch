@@ -1,21 +1,17 @@
-import React, { useContext, useState, useEffect } from 'react';
 import { Assets } from '../assets/assets';
 import { NavLink, Link } from 'react-router-dom';
 import { ShopContext } from '../context/shopcontext';
+import React, { useState, useContext, useEffect } from 'react';
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const { setShowSearch, getCartCount } = useContext(ShopContext);
   const [dropOn, setDropOn] = useState(false);
-
-  // Handle mobile menu visibility toggle
   const handleMenuToggle = () => setVisible(prevState => !prevState);
 
   const toggleDropdown = () => {
     setDropOn(prev => !prev);
   };
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest('.dropdown')) {
@@ -28,22 +24,23 @@ const Navbar = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
-
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("id");
+  }
   return (
     <div aria-label="Navigation Bar" className="flex items-center justify-between py-5 font-medium">
-      {/* Logo Section */}
       <Link to="/" aria-label="Go to Homepage">
         <img
           src={Assets.full_logo}
           className="mb-5"
           alt="Logo"
-          width="160"  // Set width
-          height="40"  // Set height
+          width="160"  
+          height="40"         
         />
         <span className="hidden">Go to Homepage</span>
       </Link>
 
-      {/* Desktop Navigation Links */}
       <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
         <li>
           <NavLink to="/" className="flex flex-col items-center gap-1">
@@ -70,8 +67,6 @@ const Navbar = () => {
           </NavLink>
         </li>
       </ul>
-
-      {/* Navbar Icons */}
       <div className="flex items-center gap-4">
         <button onClick={() => setShowSearch(true)} className="w-7 h-7 cursor-pointer">
           <img
@@ -84,7 +79,6 @@ const Navbar = () => {
           />
         </button>
 
-        {/* Profile Dropdown */}
         <div className="relative dropdown">
           <button className="cursor-pointer" onClick={toggleDropdown}>
             <img
@@ -98,15 +92,15 @@ const Navbar = () => {
 
           {dropOn && (
             <div className="absolute left-0 top-full z-10 bg-white shadow-lg">
-              <a className="block py-2 px-4 text-black hover:bg-gray-200" href="/login">Sign In</a>
+              <a className="block py-2 px-4 text-black hover:bg-gray-200" href="/login">Log In</a>
+              <a className="block py-2 px-4 text-black hover:bg-gray-200" onClick={handleLogout}>Log Out</a>
               <a className="block py-2 px-4 text-black hover:bg-gray-200" href="/orders">Orders</a>
-              <a className="block py-2 px-4 text-black hover:bg-gray-200" href="#">Log Out</a>
             </div>
           )}
         </div>
 
         {/* Cart Icon */}
-        <Link to="/cart" className="relative block" tabIndex="0" aria-label={`View cart with ${getCartCount()} items`}>
+        <Link to="/cart" className="relative block" tabIndex="0">
           <img
             loading="lazy"
             src={Assets.cart_icon}
